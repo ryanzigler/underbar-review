@@ -247,16 +247,27 @@
   _.extend = function(obj) {
     var args = arguments;
     for (var i = 0; i < arguments.length; i++) {
-      var sourceArgs = arg[i];
-      for (key in sourceArgs) {
-
+      var sourceArgs = args[i];
+      for (var key in sourceArgs) {
+        obj[key] = sourceArgs[key];
       }
     }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var args = arguments;
+    for (var i = 0; i < arguments.length; i++) {
+      var sourceArgs = args[i];
+      for (var key in sourceArgs) {
+        if (!(key in obj)) {
+          obj[key] = sourceArgs[key];
+        }
+      }
+    }
+    return obj;
   };
 
 
@@ -300,6 +311,27 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var memo = {};
+
+    return function () {
+      var key = JSON.stringify(arguments);
+      var result;
+      // if arguments of calling the function are within memo, return the value at the key of memo
+      if (key in memo) {
+        result = memo[key];
+      } else {
+        memo[key] = func.apply(this, arguments);
+        result = memo[key];
+      }
+      return result;
+      //if (!(key in memo)) {
+      //  memo[key] = func.apply(this, arguments);
+
+      //} else {
+      //  return memo[key];
+      //}
+    };
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -309,6 +341,8 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var args = Array.prototype.slice.call(arguments, 2, arguments.length);
+    return setTimeout(function() { return func.apply(null, args) }, wait);
   };
 
 
