@@ -217,11 +217,12 @@
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
     iterator = iterator || _.identity;
-    console.log(collection);
     if (collection.length === 0) { return false; }
-    return !_.every(collection, function(item, present) {
-      return !iterator(item) && present;
-    });
+    var accumulator = true;
+    for (var i = 0; i < collection.length; i++) {
+      accumulator = accumulator && !iterator(collection[i]);
+    }
+    return !accumulator;
   };
 
 
