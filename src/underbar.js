@@ -38,6 +38,9 @@
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
+    if (n === 0) { return []; }
+    if (n > array.length - 1) { return array; }
+    return n === undefined ? array[array.length - 1] : array.slice(n);
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -46,6 +49,16 @@
   // Note: _.each does not have a return value, but rather simply runs the
   // iterator function over each item in the input collection.
   _.each = function(collection, iterator) {
+    if (Array.isArray(collection)) {
+      for (var i = 0; i < collection.length; i++) {
+        iterator(collection[i], i, collection);
+      }
+    } else {
+      for (var key in collection) {
+        iterator(collection[key], key, collection);
+      }
+    }
+
   };
 
   // Returns the index at which value can be found in the array, or -1 if value
@@ -67,16 +80,46 @@
 
   // Return all elements of an array that pass a truth test.
   _.filter = function(collection, test) {
+    var resultArray = [];
+    _.each(collection, function (item) {
+      if (test(item)) {
+        resultArray.push(item);
+      }
+    });
+    return resultArray;
   };
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
+    //return _.filter(collection, function (item) {
+    //  test(item);
+    //});
+    var resultArray = [];
+    _.each(collection, function (item) {
+      if (!test(item)) {
+        resultArray.push(item);
+      }
+    });
+    return resultArray;
     // copying code in and modifying it
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
+    var hasher = [];
+    var resultArray = [];
+    if (!iterator) {
+      return Array.from(new Set(array));
+    }
+
+    _.each(array, function (value) {
+      if (!hasher.includes(iterator(value))) {
+        hasher.push(iterator(value));
+        resultArray.push(value);
+      }
+    });
+    return resultArray;
   };
 
 
@@ -85,6 +128,12 @@
     // map() is a useful primitive iteration function that works a lot
     // like each(), but in addition to running the operation on all
     // the members, it also maintains an array of results.
+    var resultArray = [];
+    for (var i = 0; i < collection.length; i++) {
+      resultArray.push(iterator(collection[i]));
+    }
+
+    return resultArray;
   };
 
   /*
@@ -126,6 +175,19 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+
+    if (accumulator === undefined) {
+      accumulator = collection[0];
+      var collectionSlice = collection.slice(1, collection.length);
+      _.each(collectionSlice, function (item) {
+        accumulator = iterator(accumulator, item);
+      });
+    } else {
+      _.each(collection, function(item) {
+        accumulator = iterator(accumulator, item);
+      });
+    }
+    return accumulator;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -143,6 +205,10 @@
 
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
+    iterator = iterator || _.identity;
+    return !!_.reduce(collection, function (item, present) {
+      return iterator(item) && present;
+    }, true);
     // TIP: Try re-using reduce() here.
   };
 
@@ -150,6 +216,12 @@
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    iterator = iterator || _.identity;
+    console.log(collection);
+    if (collection.length === 0) { return false; }
+    return !_.every(collection, function(item, present) {
+      return !iterator(item) && present;
+    });
   };
 
 
@@ -172,6 +244,13 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var args = arguments;
+    for (var i = 0; i < arguments.length; i++) {
+      var sourceArgs = arg[i];
+      for (key in sourceArgs) {
+
+      }
+    }
   };
 
   // Like extend, but doesn't ever overwrite a key that already
