@@ -342,7 +342,7 @@
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
     var args = Array.prototype.slice.call(arguments, 2, arguments.length);
-    return setTimeout(function() { return func.apply(null, args) }, wait);
+    return setTimeout(function() { return func.apply(null, args); }, wait);
   };
 
 
